@@ -1,2 +1,49 @@
 @import './common';
-@import './example';
+
+.container {
+  width: 1200px;
+  padding: 0 15px;
+  text-align: center;
+  margin: 0 auto;
+}
+
+.search-section {
+  position: fixed;
+  width: 100%;
+  background-color: #b9b9b9;
+}
+
+.search-form {
+  padding: 10px;
+}
+
+.gallery-section {
+  padding-top: 44px;
+  background-color: #f6ffe7;
+  min-height: 100vh;
+}
+
+.gallery {
+  padding-top: 30px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 30px;
+  img {
+    display: block;
+    width: 270px;
+    height: auto;
+  }
+}
+.photo-card {
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  color: #000;
+}
+
+.info {
+  flex-grow: 1;
+  display: flex;
+  justify-content: flex-end;
+  flex-direction: column;
+}

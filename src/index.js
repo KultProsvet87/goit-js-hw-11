@@ -2,14 +2,21 @@ import { Notify } from 'notiflix';
 import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
 
-import { searchApi } from './api/searchApi';
 import { refs } from './js/refs';
+import { getGallerydData } from './js/getGalleryData';
 
 import createMarkUp from './templates/imgCardMarkUp.hbs';
 
-let q = null;
-let page = 1;
-let per_page = 40;
+const searchParams = {
+  params: {
+    q: null,
+    page: 1,
+    per_page: 40,
+    image_type: 'photo',
+    orientation: 'horizontal',
+    safesearch: true,
+  },
+};
 let maxPage = 1;
 
 const observerOptions = {
@@ -30,15 +37,17 @@ refs.form.addEventListener('submit', onSearchSubmit);
 
 async function onSearchSubmit(e) {
   e.preventDefault();
+  if (
+    !e.currentTarget.elements.searchQuery.value ||
+    searchParams.params.q === e.currentTarget.elements.searchQuery.value
+  )
+    return;
+
   refs.gallery.innerHTML = '';
-  q = e.currentTarget.elements.searchQuery.value;
-  page = 1;
-  let res = null;
-  try {
-    res = await searchApi.get('?', { params: { q, page, per_page } });
-  } catch (err) {
-    Notify.failure('Something went wrong');
-  }
+  searchParams.params.q = e.currentTarget.elements.searchQuery.value;
+  searchParams.params.page = 1;
+  const res = await getGallerydData(searchParams);
+  console.log(res);
 
   if (!res.data.hits.length) {
     Notify.failure(
@@ -47,7 +56,7 @@ async function onSearchSubmit(e) {
     return;
   }
   refs.gallery.insertAdjacentHTML('beforeend', createMarkUp(res.data));
-  maxPage = Math.ceil(res.data.totalHits / per_page);
+  maxPage = Math.ceil(res.data.totalHits / searchParams.params.per_page);
   observer.observe(refs.scrollPoint);
   gallery.refresh();
   Notify.success(`Hooray! We found ${res.data.totalHits} images.`);
@@ -56,20 +65,13 @@ async function onSearchSubmit(e) {
 async function galleryUpdate(enteries) {
   if (refs.gallery.innerHTML == '') return;
   if (!enteries[0].isIntersecting) return;
-  if (page == maxPage) {
-    Notify.failure(
-      "We're sorry, but you've reached the end of search results."
-    );
+  if (searchParams.params.page == maxPage) {
+    Notify.info("We're sorry, but you've reached the end of search results.");
     return;
   }
 
-  page += 1;
-  let res = null;
-  try {
-    res = await searchApi.get('?', { params: { q, page, per_page } });
-  } catch (err) {
-    Notify.failure('Something went wrong');
-  }
+  searchParams.params.page += 1;
+  const res = await getGallerydData(searchParams);
   refs.gallery.insertAdjacentHTML('beforeend', createMarkUp(res.data));
   gallery.refresh();
 }

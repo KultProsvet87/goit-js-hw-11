@@ -45,9 +45,9 @@ async function onSearchSubmit(e) {
 
   refs.gallery.innerHTML = '';
   searchParams.params.q = e.currentTarget.elements.searchQuery.value;
+  e.currentTarget.elements.searchQuery.value = '';
   searchParams.params.page = 1;
   const res = await getGallerydData(searchParams);
-  console.log(res);
 
   if (!res.data.hits.length) {
     Notify.failure(

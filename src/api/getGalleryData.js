@@ -2,13 +2,12 @@ import { Notify } from 'notiflix';
 import { searchApi } from './searchApi';
 
 export async function getGallerydData(params) {
-  let res = null;
   try {
-    res = await searchApi.get('', { params });
+    return await searchApi.get('', { params });
   } catch (err) {
     Notify.failure('Something went wrong');
+    return;
   }
-  return res;
 }
 
 export const searchParams = {
